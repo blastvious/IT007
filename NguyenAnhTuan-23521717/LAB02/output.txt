@@ -1,0 +1,2 @@
+Chuoi Xin chao AnhTuanna ton tai trong file test.txt.
+Chuoi asdas khong ton tai trong file test.txt.
