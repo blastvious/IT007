@@ -48,12 +48,17 @@ void printProcess(int n, PCB P[])
 }
 void exportGanttChart(int n, PCB P[])
 {
-    printf("\n===== Gantt Chart =====\n");
-    for(int i = 0; i < n; i++){
-        printf("|P%d   |\t%d\t| %d\t|\n", P[i].iPID, P[i].iArrival, P[i].iBurst);
+    printf("Gantt Chart:\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("| P%d ", P[i].iPID);
     }
-
-    
+    printf("|\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d   ", P[i].iStart);
+    }
+    printf("%d\n", P[n - 1].iFinish);
 }
 void pushProcess(int *n, PCB P[], PCB Q)
 {
@@ -134,21 +139,25 @@ void quickSort(PCB P[], int low, int high, int iCriteria)
         quickSort(P, pos + 1, high, iCriteria);
     }
 }
-void calculateAWT(int n, PCB P[]){
+void calculateAWT(int n, PCB P[])
+{
     int totalWaitingTime = 0;
     printf("Waiting time: ");
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++)
+    {
         printf("P%d = %d | ", P[i].iPID, P[i].iWaiting);
         totalWaitingTime += P[i].iWaiting;
     }
     printf("\n");
     printf("Average Waiting Time: %.2f\n", (float)totalWaitingTime / n);
 }
-void calculateATaT(int n, PCB P[]){
+void calculateATaT(int n, PCB P[])
+{
     int totalTat = 0;
     printf("Turnaround Time: ");
-    for(int i = 0; i < n; i++){
-        printf("P%d = %d | ", P[i].iPID,P[i].iTaT);
+    for (int i = 0; i < n; i++)
+    {
+        printf("P%d = %d | ", P[i].iPID, P[i].iTaT);
         totalTat += P[i].iTaT;
     }
     printf("\n");
@@ -165,55 +174,46 @@ int main()
     scanf("%d", &iNumberOfProcess);
     int iRemain = iNumberOfProcess, iReady = 0, iTerminated = 0;
     inputProcess(iNumberOfProcess, Input);
-
-    quickSort(Input, 0, iNumberOfProcess - 1, SORT_BY_ARRIVAL);
+    printf("Initial Processes:\n");
     printProcess(iNumberOfProcess, Input);
+    quickSort(Input, 0, iNumberOfProcess - 1, SORT_BY_ARRIVAL);
+    // printf("After SORT:\n");
+    // printProcess(iNumberOfProcess, Input);
     pushProcess(&iReady, ReadyQueue, Input[0]);
-    exportGanttChart(iNumberOfProcess, Input);
     removeProcess(&iRemain, 0, Input);
     ReadyQueue[0].iStart = ReadyQueue[0].iArrival;
-    ReadyQueue[0].iFinish = ReadyQueue[0].iStart +
-    ReadyQueue[0].iBurst;
-    ReadyQueue[0].iResponse = ReadyQueue[0].iStart -
-    ReadyQueue[0].iArrival;
+    ReadyQueue[0].iFinish = ReadyQueue[0].iStart + ReadyQueue[0].iBurst;
+    ReadyQueue[0].iResponse = ReadyQueue[0].iStart - ReadyQueue[0].iArrival;
     ReadyQueue[0].iWaiting = ReadyQueue[0].iResponse;
-    ReadyQueue[0].iTaT = ReadyQueue[0].iFinish -
-    ReadyQueue[0].iArrival;
-    printf("\nReady Queue: ");
-    printProcess(1, ReadyQueue);
+    ReadyQueue[0].iTaT = ReadyQueue[0].iFinish - ReadyQueue[0].iArrival;
+
     while (iTerminated < iNumberOfProcess)
     {
-    while (iRemain > 0)
-    {
-    if (Input[0].iArrival <= ReadyQueue[0].iFinish)
-    {
-    pushProcess(&iReady, ReadyQueue, Input[0]);
-    removeProcess(&iRemain, 0, Input);
-    continue;
-    }
-    else
-    break;
-    }
-    if (iReady > 0)
-    {
-        pushProcess(&iTerminated, TerminatedArray,
-    ReadyQueue[0]);
-    removeProcess(&iReady, 0, ReadyQueue);
-    ReadyQueue[0].iStart = TerminatedArray[iTerminated
-    - 1].iFinish;
-    ReadyQueue[0].iFinish = ReadyQueue[0].iStart +
-    ReadyQueue[0].iBurst;
-    ReadyQueue[0].iResponse = ReadyQueue[0].iStart -
-    ReadyQueue[0].iArrival;
-    ReadyQueue[0].iWaiting = ReadyQueue[0].iResponse;
-    ReadyQueue[0].iTaT = ReadyQueue[0].iFinish -
-    ReadyQueue[0].iArrival;
-    }
+        while (iRemain > 0)
+        {
+            if (Input[0].iArrival <= ReadyQueue[0].iFinish)
+            {
+                pushProcess(&iReady, ReadyQueue, Input[0]);
+                removeProcess(&iRemain, 0, Input);
+                continue;
+            }
+            else
+                break;
+        }
+        if (iReady > 0)
+        {
+            pushProcess(&iTerminated, TerminatedArray, ReadyQueue[0]);
+            removeProcess(&iReady, 0, ReadyQueue);
+            ReadyQueue[0].iStart = TerminatedArray[iTerminated - 1].iFinish;
+            ReadyQueue[0].iFinish = ReadyQueue[0].iStart + ReadyQueue[0].iBurst;
+            ReadyQueue[0].iResponse = ReadyQueue[0].iStart - ReadyQueue[0].iArrival;
+            ReadyQueue[0].iWaiting = ReadyQueue[0].iResponse;
+            ReadyQueue[0].iTaT = ReadyQueue[0].iFinish - ReadyQueue[0].iArrival;
+        }
     }
     printf("\n===== FCFS Scheduling =====\n");
     exportGanttChart(iTerminated, TerminatedArray);
-    quickSort(TerminatedArray, 0, iTerminated - 1,
-    SORT_BY_PID);
+    quickSort(TerminatedArray, 0, iTerminated - 1, SORT_BY_PID);
     calculateAWT(iTerminated, TerminatedArray);
     calculateATaT(iTerminated, TerminatedArray);
     return 0;
