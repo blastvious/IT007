@@ -53,12 +53,12 @@ void on_sigint(int sigint)
 {
     if(pid > 0){
         kill(pid, SIGINT);
-        printf("Ctrl was pressed !!! ╰(*°▽°*)╯\n");
+        printf("Ctrl C was pressed !!! ╰(*°▽°*)╯\n");
     }
     else{
         sigint_count++;
         if(sigint_count >= 2){
-            printf("^C (❁´◡`❁)\n");
+            printf("(❁´◡`❁)\n");
             exit(0);
         }
         else{
